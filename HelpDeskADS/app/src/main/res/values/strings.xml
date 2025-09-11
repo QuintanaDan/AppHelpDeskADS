@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Help Desk ADS</string>
+
+    <!-- Telas de Login -->
+    <string name="login">Login</string>
+    <string name="campo_email">E-mail</string>
+    <string name="senha">Senha</string>
+    <string name="entrar">Entrar</string>
+    <string name="esqueceu_senha">Esqueceu sua senha?</string>
+    <string name="cadastrar">Cadastrar</string>
+
+    <!-- Tela Principal -->
+    <string name="bem_vindo">Bem-vindo ao Help Desk ADS</string>
+    <string name="novo_chamado">Novo Chamado</string>
+    <string name="meus_chamados">Meus Chamados</string>
+    <string name="notificacoes">Notificações</string>
+    <string name="relatorios">Relatórios</string>
+    <string name="perfil">Perfil</string>
+
+    <!-- Chamados -->
+    <string name="titulo_chamado">Título do Chamado</string>
+    <string name="descricao_problema">Descrição do Problema</string>
+    <string name="categoria">Categoria</string>
+    <string name="prioridade">Prioridade</string>
+    <string name="criar_chamado">Criar Chamado</string>
+    <string name="anexar_arquivo">Anexar Arquivo</string>
+
+    <!-- Categorias -->
+    <string name="hardware">Hardware</string>
+    <string name="software">Software</string>
+    <string name="rede">Rede</string>
+    <string name="categoria_email">E-mail</string>
+    <string name="impressora">Impressora</string>
+    <string name="outros">Outros</string>
+
+    <!-- Prioridades -->
+    <string name="baixa">Baixa</string>
+    <string name="media">Média</string>
+    <string name="alta">Alta</string>
+    <string name="critica">Crítica</string>
+
+    <!-- Status -->
+    <string name="aberto">Aberto</string>
+    <string name="em_andamento">Em Andamento</string>
+    <string name="aguardando_cliente">Aguardando Cliente</string>
+    <string name="fechado">Fechado</string>
+
+    <!-- Mensagens -->
+    <string name="sucesso_chamado">Chamado criado com sucesso!</string>
+    <string name="erro_campos">Por favor, preencha todos os campos</string>
+    <string name="erro_login">E-mail ou senha incorretos</string>
+    <string name="erro_conexao">Erro de conexão</string>
+    <string name="carregando">Carregando...</string>
+
+    <!-- Menu -->
+    <string name="sair">Sair</string>
+    <string name="configuracoes">Configurações</string>
+    <string name="sobre">Sobre</string>
+
+    <!-- Help Desk -->
+    <string name="sistema_chamados">Sistema de Chamados</string>
+    <string name="suporte_tecnico">Suporte Técnico</string>
+</resources>

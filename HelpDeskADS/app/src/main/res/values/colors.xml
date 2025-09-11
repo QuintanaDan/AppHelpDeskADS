@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores Principais IATI -->
+    <color name="primary_blue_purple">#6366f1</color>
+    <color name="gradient_start">#667eea</color>
+    <color name="gradient_end">#764ba2</color>
+    <color name="white">#ffffff</color>
+    <color name="dark_gray_text">#333333</color>
+
+    <!-- Cores Secundárias -->
+    <color name="light_gray_background">#f8fafc</color>
+    <color name="bluish_gray_text">#64748b</color>
+    <color name="dark_gray_footer">#1e293b</color>
+    <color name="medium_gray_border">#334155</color>
+    <color name="light_gray_links">#94a3b8</color>
+
+    <!-- Cores de Notificação -->
+    <color name="blue_notification">#3b82f6</color>
+    <color name="red_notification">#ef4444</color>
+
+    <!-- Cores para Status de Chamados -->
+    <color name="status_aberto">#ef4444</color>
+    <color name="status_em_andamento">#f59e0b</color>
+    <color name="status_fechado">#10b981</color>
+
+    <!-- Cores do Sistema -->
+    <color name="black">#FF000000</color>
+</resources>
