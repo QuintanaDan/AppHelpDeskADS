@@ -133,4 +133,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursorChamados.close();
     }
 
+    public Cursor buscarChamadosPorUsuario(int usuarioId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT * FROM " + TABLE_CHAMADO + " WHERE id_usuario = ? ORDER BY data_abertura DESC",
+                new String[]{String.valueOf(usuarioId)}
+        );
+    }
+
+    public Cursor buscarUsuarioPorEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT * FROM " + TABLE_USUARIO + " WHERE email = ?",
+                new String[]{email}
+        );
+    }
+
+
 }

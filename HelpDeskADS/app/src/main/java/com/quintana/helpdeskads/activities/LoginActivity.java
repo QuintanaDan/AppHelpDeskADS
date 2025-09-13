@@ -68,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         // Validações básicas
         if (email.isEmpty()) {
             editTextEmail.setError("Email é obrigatório");
-            editTextEmail.requestFocus();
+            editTextSenha.requestFocus();
             return;
         }
 
@@ -82,16 +82,27 @@ public class LoginActivity extends AppCompatActivity {
         if (verificarCredenciais(email, senha)) {
             Toast.makeText(this, "Login realizado com sucesso!", Toast.LENGTH_SHORT).show();
 
+            // Salvar email nas preferências
+            getSharedPreferences("HelpDeskPrefs", MODE_PRIVATE)
+                    .edit()
+                    .putString("usuario_email", email)
+                    .apply();
+
+            // Log para debug
+            Log.d("LOGIN", "Email salvo: '" + email + "'");
+
             // Ir para a tela principal
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.putExtra("usuario_email", email);
             startActivity(intent);
             finish(); // Fecha a tela de login
+
         } else {
             Toast.makeText(this, "Email ou senha incorretos!", Toast.LENGTH_SHORT).show();
             editTextSenha.setText(""); // Limpa a senha
         }
     }
+
 
     private boolean verificarCredenciais(String email, String senha) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();

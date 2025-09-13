@@ -3,12 +3,14 @@ package com.quintana.helpdeskads.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.quintana.helpdeskads.R;
 import com.quintana.helpdeskads.adapters.ChamadosAdapter;
+import com.quintana.helpdeskads.database.DatabaseHelper;
 import com.quintana.helpdeskads.models.Chamado;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class MeusChamadosActivity extends AppCompatActivity {
     private LinearLayout layoutSemChamados;
     private ChamadosAdapter chamadosAdapter;
     private List<Chamado> listaChamados;
+    private DatabaseHelper databaseHelper;
+    private String usuarioEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +31,13 @@ public class MeusChamadosActivity extends AppCompatActivity {
         try {
             Log.d("MeusChamados", "Iniciando onCreate...");
             setContentView(R.layout.activity_meus_chamados);
-            Log.d("MeusChamados", "Layout definido com sucesso!");
+
+            // Receber dados do Intent
+            usuarioEmail = getIntent().getStringExtra("usuario_email");
+            Log.d("MeusChamados", "Usuario email: " + usuarioEmail);
+
+            // Inicializar banco de dados
+            databaseHelper = new DatabaseHelper(this);
 
             // Inicializar componentes
             inicializarComponentes();
@@ -35,10 +45,8 @@ public class MeusChamadosActivity extends AppCompatActivity {
             // Configurar RecyclerView
             configurarRecyclerView();
 
-            // Carregar dados (simulados)
-            carregarDados();
-
-            Toast.makeText(this, "Tela carregada com sucesso!", Toast.LENGTH_SHORT).show();
+            // Carregar dados do banco
+            carregarChamadosDoBanco();
 
         } catch (Exception e) {
             Log.e("MeusChamados", "ERRO: " + e.getMessage());
@@ -46,6 +54,13 @@ public class MeusChamadosActivity extends AppCompatActivity {
             Toast.makeText(this, "ERRO: " + e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recarregar dados sempre que a tela voltar ao foco
+        carregarChamadosDoBanco();
     }
 
     private void inicializarComponentes() {
@@ -60,62 +75,75 @@ public class MeusChamadosActivity extends AppCompatActivity {
         recyclerViewChamados.setAdapter(chamadosAdapter);
     }
 
-    private void carregarDados() {
-        // Ordem correta: id, titulo, descricao, categoria, prioridade, status, dataCriacao, usuarioId
-        listaChamados.add(new Chamado(
-                1,                                    // id (int)
-                "Problema no computador",             // titulo (String)
-                "O computador está muito lento",      // descricao (String)
-                "Hardware",                           // categoria (String)
-                "Alta",                              // prioridade (String)
-                "Aberto",                            // status (String)
-                "11/09/2024 14:30",                  // dataCriacao (String)
-                123                                  // usuarioId (int)
-        ));
+    private void carregarChamadosDoBanco() {
+        try {
+            // Limpar lista atual
+            listaChamados.clear();
 
-        listaChamados.add(new Chamado(
-                2,                                   // id (int)
-                "Erro no sistema",                   // titulo (String)
-                "Sistema travando constantemente",   // descricao (String)
-                "Software",                         // categoria (String)
-                "Media",                            // prioridade (String)
-                "Em Andamento",                     // status (String)
-                "10/09/2024 09:15",                 // dataCriacao (String)
-                123                                 // usuarioId (int)
-        ));
+            // DEBUG: Verificar o email recebido
+            Log.d("MeusChamados", "Email recebido: '" + usuarioEmail + "'");
 
-        listaChamados.add(new Chamado(
-                3,                                  // id (int)
-                "Impressora não funciona",          // titulo (String)
-                "Impressora não está respondendo",  // descricao (String)
-                "Hardware",                         // categoria (String)
-                "Baixa",                           // prioridade (String)
-                "Fechado",                         // status (String)
-                "09/09/2024 16:45",                // dataCriacao (String)
-                123                                // usuarioId (int)
-        ));
+            if (usuarioEmail == null || usuarioEmail.isEmpty()) {
+                Toast.makeText(this, "Email não foi passado corretamente!", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-        listaChamados.add(new Chamado(
-                4,                                 // id (int)
-                "Internet lenta",                  // titulo (String)
-                "Conexão muito instável",          // descricao (String)
-                "Rede",                           // categoria (String)
-                "Urgente",                        // prioridade (String)
-                "Aberto",                         // status (String)
-                "11/09/2024 10:20",               // dataCriacao (String)
-                123                               // usuarioId (int)
-        ));
+            // Buscar usuário pelo email para pegar o ID
+            int usuarioId = buscarUsuarioIdPorEmail(usuarioEmail);
+            Log.d("MeusChamados", "Usuario ID encontrado: " + usuarioId);
 
-        // Atualizar adapter
-        chamadosAdapter.notifyDataSetChanged();
+            if (usuarioId == -1) {
+                Toast.makeText(this, "Usuário não encontrado para email: " + usuarioEmail, Toast.LENGTH_LONG).show();
+                // DEBUG: Mostrar todos os usuários do banco
+                mostrarTodosUsuarios();
+                return;
+            }
 
-        // Mostrar/ocultar mensagem de sem chamados
-        if (listaChamados.isEmpty()) {
-            layoutSemChamados.setVisibility(android.view.View.VISIBLE);
-            recyclerViewChamados.setVisibility(android.view.View.GONE);
-        } else {
-            layoutSemChamados.setVisibility(android.view.View.GONE);
-            recyclerViewChamados.setVisibility(android.view.View.VISIBLE);
+            // ... resto do código igual
+        } catch (Exception e) {
+            Log.e("MeusChamados", "Erro ao carregar chamados: " + e.getMessage());
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao carregar chamados: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+
+    private int buscarUsuarioIdPorEmail(String email) {
+        try {
+            Cursor cursor = databaseHelper.buscarUsuarioPorEmail(email);
+            if (cursor != null && cursor.moveToFirst()) {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id_usuario"));
+                cursor.close();
+                return id;
+            }
+        } catch (Exception e) {
+            Log.e("MeusChamados", "Erro ao buscar usuário: " + e.getMessage());
+        }
+        return -1;
+    }
+
+    private void mostrarTodosUsuarios() {
+        try {
+            Cursor cursor = databaseHelper.getReadableDatabase().rawQuery("SELECT * FROM Usuario", null);
+            Log.d("MeusChamados", "=== TODOS OS USUÁRIOS ===");
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow("id_usuario"));
+                    String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome_completo"));
+                    String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
+
+                    Log.d("MeusChamados", "ID: " + id + " | Nome: " + nome + " | Email: '" + email + "'");
+
+                } while (cursor.moveToNext());
+                cursor.close();
+            } else {
+                Log.d("MeusChamados", "Nenhum usuário encontrado no banco!");
+            }
+
+        } catch (Exception e) {
+            Log.e("MeusChamados", "Erro ao mostrar usuários: " + e.getMessage());
         }
     }
 

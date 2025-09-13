@@ -76,10 +76,10 @@ public class NovoChamadoActivity extends AppCompatActivity {
         // Prioridades
         String[] prioridades = {
                 "Selecione a prioridade...",
-                "BAIXA",
-                "MEDIA",
-                "ALTA",
-                "URGENTE"
+                "BAIXA - Não afeta o trabalho",
+                "MEDIA - Afeta Parcialmente",
+                "ALTA - Afeta Significativamente",
+                "URGENTE - Sistema Parado"
         };
 
         ArrayAdapter<String> adapterPrioridade = new ArrayAdapter<>(

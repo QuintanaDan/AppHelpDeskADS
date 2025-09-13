@@ -157,9 +157,10 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="CANCELAR"
-                    android:textColor="#666666"
+                    android:textColor="#FFFFFF"
                     android:textSize="14sp"
-                    android:backgroundTint="#E0E0E0" />
+                    android:textStyle="bold"
+                    android:backgroundTint="#F44336" />
 
                 <Button
                     android:id="@+id/buttonSalvarChamado"
@@ -167,7 +168,7 @@
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
-                    android:text="CRIAR\nCHAMADO"
+                    android:text="CRIAR CHAMADO"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:backgroundTint="#4CAF50"
