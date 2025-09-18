@@ -17,6 +17,17 @@ public class Chamado {
     public static final int PRIORIDADE_ALTA = 3;
     public static final int PRIORIDADE_CRITICA = 4;
 
+    // Constantes de Categoria
+    public static final int CATEGORIA_HARDWARE = 1;
+    public static final int CATEGORIA_SOFTWARE = 2;
+    public static final int CATEGORIA_REDE = 3;
+    public static final int CATEGORIA_SISTEMA = 4;
+    public static final int CATEGORIA_OUTROS = 5;
+
+    // Atributos (adicione após os outros atributos)
+    private int categoria;
+
+
     // Atributos
     private long id;
     private String numero;
@@ -28,10 +39,11 @@ public class Chamado {
     private String createdAt;
     private String updatedAt;
 
-    // Construtor vazio
+    /// Construtor vazio
     public Chamado() {
         this.status = STATUS_ABERTO;
         this.prioridade = PRIORIDADE_MEDIA;
+        this.categoria = CATEGORIA_SISTEMA; // padrão
     }
 
     // Construtor principal
@@ -41,8 +53,40 @@ public class Chamado {
         this.clienteId = clienteId;
         this.status = STATUS_ABERTO;
         this.prioridade = PRIORIDADE_MEDIA;
+        this.categoria = CATEGORIA_SISTEMA; // padrão
         this.numero = gerarNumero();
     }
+
+    public int getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(int categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getCategoriaTexto() {
+        switch (categoria) {
+            case CATEGORIA_HARDWARE: return "Hardware";
+            case CATEGORIA_SOFTWARE: return "Software";
+            case CATEGORIA_REDE: return "Rede";
+            case CATEGORIA_SISTEMA: return "Sistema";
+            case CATEGORIA_OUTROS: return "Outros";
+            default: return "Sistema";
+        }
+    }
+
+    public String getCategoriaTextoCompleto() {
+        switch (categoria) {
+            case CATEGORIA_HARDWARE: return "🔧 HARDWARE";
+            case CATEGORIA_SOFTWARE: return "💻 SOFTWARE";
+            case CATEGORIA_REDE: return "🌐 REDE";
+            case CATEGORIA_SISTEMA: return "⚙️ SISTEMA";
+            case CATEGORIA_OUTROS: return "📋 OUTROS";
+            default: return "⚙️ SISTEMA";
+        }
+    }
+
 
     // Getters e Setters
     public long getId() {

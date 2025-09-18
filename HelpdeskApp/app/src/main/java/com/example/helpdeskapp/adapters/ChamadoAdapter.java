@@ -1,17 +1,17 @@
 package com.example.helpdeskapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.helpdeskapp.DetalhesChamadoActivity;
 import com.example.helpdeskapp.R;
 import com.example.helpdeskapp.models.Chamado;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class ChamadoAdapter extends RecyclerView.Adapter<ChamadoAdapter.ChamadoViewHolder> {
 
@@ -46,35 +46,32 @@ public class ChamadoAdapter extends RecyclerView.Adapter<ChamadoAdapter.ChamadoV
         holder.tvNumero.setText(chamado.getNumero());
         holder.tvTitulo.setText(chamado.getTitulo());
         holder.tvDescricao.setText(chamado.getDescricao());
+        holder.tvStatus.setText(chamado.getStatusTexto());
+        holder.tvPrioridade.setText(chamado.getPrioridadeTextoCompleto());
 
-        // Status
-        String statusTexto = getStatusTexto(chamado.getStatus());
-        holder.tvStatus.setText(statusTexto);
-        holder.tvStatus.setBackgroundResource(getStatusBackground(chamado.getStatus()));
-
-        // Prioridade
-        String prioridadeTexto = getPrioridadeTexto(chamado.getPrioridade());
-        holder.tvPrioridade.setText(prioridadeTexto);
-
-        // Data
+        // Data (se existir)
         if (chamado.getCreatedAt() != null && !chamado.getCreatedAt().isEmpty()) {
-            try {
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                String dataFormatada = outputFormat.format(inputFormat.parse(chamado.getCreatedAt()));
-                holder.tvData.setText(dataFormatada);
-            } catch (Exception e) {
-                holder.tvData.setText(chamado.getCreatedAt());
-            }
+            holder.tvData.setText(formatarData(chamado.getCreatedAt()));
+        } else {
+            holder.tvData.setText("Data não disponível");
         }
 
-        // Click listener no onBindViewHolder
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onChamadoClick(chamado);
+        // ✅ ÚNICO click listener (SEM LAMBDA)
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Abrir tela de detalhes
+                Intent intent = new Intent(context, DetalhesChamadoActivity.class);
+                intent.putExtra("chamado_id", chamado.getId());
+                intent.putExtra("numero_chamado", chamado.getNumero());
+                context.startActivity(intent);
+
+                // Se há listener customizado, chamar também
+                if (listener != null) {
+                    listener.onChamadoClick(chamado);
+                }
             }
         });
-
     }
 
     @Override
@@ -82,6 +79,24 @@ public class ChamadoAdapter extends RecyclerView.Adapter<ChamadoAdapter.ChamadoV
         return chamados.size();
     }
 
+    // ✅ MÉTODO formatarData que estava faltando
+    private String formatarData(String dataCompleta) {
+        try {
+            // Formato: 2025-09-14 20:31:33 -> 14/09/2025
+            String[] parts = dataCompleta.split(" ");
+            if (parts.length >= 1) {
+                String[] dateParts = parts[0].split("-");
+                if (dateParts.length >= 3) {
+                    return dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
+                }
+            }
+        } catch (Exception e) {
+            // Se der erro, retorna a data original
+        }
+        return dataCompleta;
+    }
+
+    // Métodos auxiliares (caso precise usar no futuro)
     private String getStatusTexto(int status) {
         switch (status) {
             case Chamado.STATUS_ABERTO: return "ABERTO";
@@ -124,5 +139,11 @@ public class ChamadoAdapter extends RecyclerView.Adapter<ChamadoAdapter.ChamadoV
             tvPrioridade = itemView.findViewById(R.id.tvPrioridade);
             tvData = itemView.findViewById(R.id.tvData);
         }
+    }
+
+    // ✅ Método para atualizar lista
+    public void atualizarLista(List<Chamado> novosChamados) {
+        this.chamados = novosChamados;
+        notifyDataSetChanged();
     }
 }

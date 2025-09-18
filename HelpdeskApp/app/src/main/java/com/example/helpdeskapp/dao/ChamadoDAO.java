@@ -5,10 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-
 import com.example.helpdeskapp.database.DatabaseHelper;
 import com.example.helpdeskapp.models.Chamado;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +14,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class ChamadoDAO {
-
     private static final String TAG = "ChamadoDAO";
     private SQLiteDatabase database;
     private DatabaseHelper dbHelper;
@@ -55,9 +52,7 @@ public class ChamadoDAO {
             Log.d(TAG, "Database path: " + database.getPath());
             Log.d(TAG, "Database version: " + database.getVersion());
 
-            // Verificar se tabelas existem
             verificarTabelas();
-
         } catch (Exception e) {
             Log.e(TAG, "❌ ERRO CRÍTICO ao abrir banco de dados: ", e);
             throw e;
@@ -68,7 +63,6 @@ public class ChamadoDAO {
         try {
             Log.d(TAG, "=== VERIFICANDO TABELAS ===");
 
-            // Verificar tabela chamados
             Cursor cursor = database.rawQuery(
                     "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
                     new String[]{DatabaseHelper.TABLE_CHAMADOS}
@@ -77,29 +71,25 @@ public class ChamadoDAO {
             if (cursor.moveToFirst()) {
                 Log.d(TAG, "✅ Tabela " + DatabaseHelper.TABLE_CHAMADOS + " existe");
 
-                // Verificar estrutura da tabela
                 Cursor schemaCursor = database.rawQuery("PRAGMA table_info(" + DatabaseHelper.TABLE_CHAMADOS + ")", null);
                 Log.d(TAG, "Estrutura da tabela " + DatabaseHelper.TABLE_CHAMADOS + ":");
                 while (schemaCursor.moveToNext()) {
                     String columnName = schemaCursor.getString(1);
                     String columnType = schemaCursor.getString(2);
-                    Log.d(TAG, "  - " + columnName + " (" + columnType + ")");
+                    Log.d(TAG, " - " + columnName + " (" + columnType + ")");
                 }
                 schemaCursor.close();
-
             } else {
                 Log.e(TAG, "❌ Tabela " + DatabaseHelper.TABLE_CHAMADOS + " NÃO existe!");
             }
             cursor.close();
 
-            // Contar registros existentes
             Cursor countCursor = database.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_CHAMADOS, null);
             if (countCursor.moveToFirst()) {
                 int count = countCursor.getInt(0);
                 Log.d(TAG, "Total de chamados na tabela: " + count);
             }
             countCursor.close();
-
         } catch (Exception e) {
             Log.e(TAG, "Erro ao verificar tabelas: ", e);
         }
@@ -133,15 +123,15 @@ public class ChamadoDAO {
             }
 
             Log.d(TAG, "Dados do chamado:");
-            Log.d(TAG, "  - Número: " + chamado.getNumero());
-            Log.d(TAG, "  - Título: " + chamado.getTitulo());
-            Log.d(TAG, "  - Descrição: " + chamado.getDescricao());
-            Log.d(TAG, "  - Status: " + chamado.getStatus());
-            Log.d(TAG, "  - Prioridade: " + chamado.getPrioridade());
-            Log.d(TAG, "  - Cliente ID: " + chamado.getClienteId());
+            Log.d(TAG, " - Número: " + chamado.getNumero());
+            Log.d(TAG, " - Título: " + chamado.getTitulo());
+            Log.d(TAG, " - Descrição: " + chamado.getDescricao());
+            Log.d(TAG, " - Status: " + chamado.getStatus());
+            Log.d(TAG, " - Prioridade: " + chamado.getPrioridade());
+            Log.d(TAG, " - Cliente ID: " + chamado.getClienteId());
 
             String timestamp = getCurrentTimestamp();
-            Log.d(TAG, "  - Timestamp: " + timestamp);
+            Log.d(TAG, " - Timestamp: " + timestamp);
 
             ContentValues values = new ContentValues();
             values.put(DatabaseHelper.COLUMN_CHAMADO_NUMERO, chamado.getNumero());
@@ -163,10 +153,7 @@ public class ChamadoDAO {
             } else {
                 Log.e(TAG, "❌ FALHA! Insert retornou: " + result);
 
-                // Tentar descobrir o motivo da falha
-                Log.d(TAG, "Tentando diagnóstico da falha...");
                 try {
-                    // Verificar se número já existe
                     Cursor checkCursor = database.rawQuery(
                             "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_CHAMADOS +
                                     " WHERE " + DatabaseHelper.COLUMN_CHAMADO_NUMERO + "=?",
@@ -182,7 +169,6 @@ public class ChamadoDAO {
             }
 
             return result;
-
         } catch (Exception e) {
             Log.e(TAG, "❌ ERRO CRÍTICO ao abrir chamado: ", e);
             return -1;
@@ -251,50 +237,6 @@ public class ChamadoDAO {
         return chamados;
     }
 
-    public Chamado buscarPorId(long id) {
-        Log.d(TAG, "=== BUSCANDO CHAMADO POR ID ===");
-        Log.d(TAG, "ID procurado: " + id);
-
-        try {
-            if (database == null || !database.isOpen()) {
-                Log.e(TAG, "❌ ERRO: Database não está aberto!");
-                return null;
-            }
-
-            String query = "SELECT * FROM " + DatabaseHelper.TABLE_CHAMADOS +
-                    " WHERE " + DatabaseHelper.COLUMN_CHAMADO_ID + " = ?";
-
-            Log.d(TAG, "Query: " + query);
-
-            Cursor cursor = database.rawQuery(query, new String[]{String.valueOf(id)});
-
-            if (cursor == null) {
-                Log.e(TAG, "❌ ERRO: Cursor é null!");
-                return null;
-            }
-
-            Chamado chamado = null;
-            if (cursor.moveToFirst()) {
-                Log.d(TAG, "✅ Chamado encontrado!");
-                chamado = criarChamadoFromCursor(cursor);
-                if (chamado != null) {
-                    Log.d(TAG, "✅ Chamado criado: " + chamado.getNumero() + " - " + chamado.getTitulo());
-                } else {
-                    Log.e(TAG, "❌ Erro ao criar chamado do cursor");
-                }
-            } else {
-                Log.d(TAG, "⚠️ Nenhum chamado encontrado com ID: " + id);
-            }
-
-            cursor.close();
-            return chamado;
-
-        } catch (Exception e) {
-            Log.e(TAG, "❌ ERRO ao buscar chamado por ID: ", e);
-            return null;
-        }
-    }
-
     public boolean atualizarStatus(long id, int novoStatus) {
         Log.d(TAG, "=== ATUALIZANDO STATUS DO CHAMADO ===");
         Log.d(TAG, "ID: " + id + ", Novo status: " + novoStatus);
@@ -322,16 +264,49 @@ public class ChamadoDAO {
                 Log.e(TAG, "❌ Nenhuma linha foi afetada na atualização");
                 return false;
             }
-
         } catch (Exception e) {
             Log.e(TAG, "❌ ERRO ao atualizar status: ", e);
             return false;
         }
     }
 
+    public Chamado buscarChamadoPorId(long id) {
+        Log.d(TAG, "=== BUSCANDO CHAMADO POR ID ===");
+        Log.d(TAG, "ID: " + id);
+
+        try {
+            if (database == null || !database.isOpen()) {
+                Log.e(TAG, "❌ ERRO: Database não está aberto!");
+                return null;
+            }
+
+            Cursor cursor = database.query(
+                    DatabaseHelper.TABLE_CHAMADOS,
+                    null,
+                    DatabaseHelper.COLUMN_CHAMADO_ID + " = ?",
+                    new String[]{String.valueOf(id)},
+                    null, null, null
+            );
+
+            Chamado chamado = null;
+            if (cursor.moveToFirst()) {
+                chamado = criarChamadoFromCursor(cursor);
+                if (chamado != null) {
+                    Log.d(TAG, "✅ Chamado encontrado: " + chamado.getNumero());
+                }
+            } else {
+                Log.d(TAG, "❌ Chamado não encontrado");
+            }
+            cursor.close();
+            return chamado;
+        } catch (Exception e) {
+            Log.e(TAG, "❌ ERRO ao buscar chamado por ID: ", e);
+            return null;
+        }
+    }
+
     private Chamado criarChamadoFromCursor(Cursor cursor) {
         Log.d(TAG, "--- Criando chamado do cursor ---");
-
         try {
             if (cursor == null) {
                 Log.e(TAG, "❌ Cursor é null!");
@@ -339,10 +314,6 @@ public class ChamadoDAO {
             }
 
             Chamado chamado = new Chamado();
-
-            // Log das colunas disponíveis
-            String[] columnNames = cursor.getColumnNames();
-            Log.d(TAG, "Colunas disponíveis: " + java.util.Arrays.toString(columnNames));
 
             // ID
             int idIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CHAMADO_ID);
@@ -431,7 +402,6 @@ public class ChamadoDAO {
 
             Log.d(TAG, "✅ Chamado criado com sucesso");
             return chamado;
-
         } catch (Exception e) {
             Log.e(TAG, "❌ ERRO CRÍTICO ao criar chamado do cursor: ", e);
             return null;
